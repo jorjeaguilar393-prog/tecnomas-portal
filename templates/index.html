@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Órdenes - Taller</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-blue-600">Gestión de Órdenes de Taller</h1>
+            <p class="text-gray-600">Control de equipos y reparaciones</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md md:col-span-1">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Nueva Orden</h2>
+                <form action="/agregar" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Cliente</label>
+                        <input type="text" name="cliente" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Teléfono</label>
+                        <input type="text" name="telefono" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Equipo / Modelo</label>
+                        <input type="text" name="equipo" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Falla reportada</label>
+                        <textarea name="falla" rows="3" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium">Registrar Orden</button>
+                </form>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Órdenes Registradas</h2>
+                    <form method="GET" action="/" class="flex">
+                        <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar cliente o ID..." class="px-3 py-1 border rounded-l-md text-sm outline-none">
+                        <button type="submit" class="bg-gray-200 px-3 py-1 rounded-r-md text-sm hover:bg-gray-300">Buscar</button>
+                    </form>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 border-b text-sm text-gray-600">
+                                <th class="p-2">#</th>
+                                <th class="p-2">Cliente</th>
+                                <th class="p-2">Equipo</th>
+                                <th class="p-2">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y text-sm">
+                            {% for orden in ordenes %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-2 font-mono font-bold text-blue-600">#{{ orden.id }}</td>
+                                <td class="p-2">{{ orden.cliente }}<br><span class="text-xs text-gray-500">{{ orden.telefono }}</span></td>
+                                <td class="p-2">{{ orden.equipo }}<br><span class="text-xs text-gray-500">{{ orden.falla }}</span></td>
+                                <td class="p-2">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 font-medium">
+                                        {{ orden.estado }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-500">No hay órdenes registradas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Órdenes - Taller</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-blue-600">Gestión de Órdenes de Taller</h1>
+            <p class="text-gray-600">Control de equipos y reparaciones</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md md:col-span-1">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Nueva Orden</h2>
+                <form action="/agregar" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Cliente</label>
+                        <input type="text" name="cliente" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Teléfono</label>
+                        <input type="text" name="telefono" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Equipo / Modelo</label>
+                        <input type="text" name="equipo" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Falla reportada</label>
+                        <textarea name="falla" rows="3" required class="w-full mt-1 px-3 py-2 border rounded-md focus:ring focus:ring-blue-300 outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium">Registrar Orden</button>
+                </form>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Órdenes Registradas</h2>
+                    <form method="GET" action="/" class="flex">
+                        <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar cliente o ID..." class="px-3 py-1 border rounded-l-md text-sm outline-none">
+                        <button type="submit" class="bg-gray-200 px-3 py-1 rounded-r-md text-sm hover:bg-gray-300">Buscar</button>
+                    </form>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 border-b text-sm text-gray-600">
+                                <th class="p-2">#</th>
+                                <th class="p-2">Cliente</th>
+                                <th class="p-2">Equipo</th>
+                                <th class="p-2">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y text-sm">
+                            {% for orden in ordenes %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-2 font-mono font-bold text-blue-600">#{{ orden.id }}</td>
+                                <td class="p-2">{{ orden.cliente }}<br><span class="text-xs text-gray-500">{{ orden.telefono }}</span></td>
+                                <td class="p-2">{{ orden.equipo }}<br><span class="text-xs text-gray-500">{{ orden.falla }}</span></td>
+                                <td class="p-2">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 font-medium">
+                                        {{ orden.estado }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-500">No hay órdenes registradas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
