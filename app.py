@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template_string, request, session, url
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.secret_key = 'tecnomas_clave_secreta_taller'  # Necesario para manejar sesiones seguras
+app.secret_key = 'tecnomas_clave_secreta_taller'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tecnomas_taller.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -34,7 +34,7 @@ ESTADOS_PERMITIDOS = [
     'Entregado'
 ]
 
-# Credenciales de Administrador (puedes cambiarlas aquí cuando gustes)
+# Credenciales de Administrador
 ADMIN_USER = "admin"
 ADMIN_PASS = "tecnomas2026"
 
@@ -51,7 +51,7 @@ HTML_HEADER_CLIENTE = """
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-dark shadow-sm mb-4">
         <div class="container px-4">
-            <a class="navbar-brand fw-bold" href="/"><i class="bi bi-tools text-warning"></i> Tecnomás <span class="text-muted fs-6">| Consulta de Estado</span></a>
+            <a class="navbar-brand fw-bold" href="/"><i class="bi bi-tools text-warning"></i> Tecnomás <span class="text-muted fs-6">| Portal de Clientes</span></a>
             <a href="/login" class="btn btn-outline-warning btn-sm"><i class="bi bi-lock-fill"></i> Acceso Técnico</a>
         </div>
     </nav>
@@ -65,72 +65,90 @@ HTML_FOOTER = """
 </html>
 """
 
-# 1. PORTAL PÚBLICO DE CONSULTA PARA CLIENTES
+# 1. PORTAL PÚBLICO: REGISTRO Y CONSULTA PARA CLIENTES (ACTUALIZADO)
 TEMPLATE_CLIENTE = HTML_HEADER_CLIENTE + """
-<div class="row justify-content-center mt-5">
-    <div class="col-lg-7">
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-10">
         <div class="text-center mb-4">
-            <h1 class="fw-bold text-dark">Consulta tu Orden en Tecnomás</h1>
-            <p class="text-muted">Introduce tu número de teléfono para verificar el avance de tu dispositivo.</p>
+            <h1 class="fw-bold text-dark">Bienvenido a Tecnomás</h1>
+            <p class="text-muted">Registra tu dispositivo para reparación o consulta el estado de tu orden actual.</p>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body p-4">
-                <form method="GET" action="/" class="row g-3">
-                    <div class="col-md-9">
-                        <input type="text" class="form-control form-control-lg" name="telefono" value="{{ telefono_buscado }}" required placeholder="Ej. 89649798">
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold"><i class="bi bi-search"></i> Buscar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        {% if telefono_buscado %}
-            <h4 class="fw-bold text-secondary mb-3">Resultados para: {{ telefono_buscado }}</h4>
-            {% if ordenes %}
-                {% for orden in ordenes %}
-                <div class="card shadow-sm border-0 mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge bg-dark">Orden #{{ orden.id }}</span>
-                            <span class="text-muted small"><i class="bi bi-calendar"></i> {{ orden.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
-                        </div>
-                        <h5 class="fw-bold text-primary mb-1">{{ orden.equipo }}</h5>
-                        <p class="mb-2"><strong>Falla reportada:</strong> {{ orden.falla }}</p>
-                        
-                        <div class="p-3 bg-light rounded mb-2">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <strong>Estado actual:</strong> 
-                                    <span class="badge {% if orden.estado == 'Listo para entregar' %}bg-success{% elif orden.estado == 'Entregado' %}bg-secondary{% else %}bg-warning text-dark{% endif %} fs-6">
-                                        {{ orden.estado }}
-                                    </span>
-                                </div>
-                                <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                                    <strong>Total a Pagar:</strong> L. {{ "%.2f"|format(orden.total) }} 
-                                    <span class="badge {% if orden.estado_pago == 'Pagado' %}bg-success{% else %}bg-danger{% endif %}">
-                                        {{ orden.estado_pago }}
-                                    </span>
-                                </div>
+        <div class="row g-4">
+            <!-- FORMULARIO DE REGISTRO PARA EL CLIENTE -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold text-primary mb-3"><i class="bi bi-plus-circle-fill"></i> Registrar mi Dispositivo</h4>
+                        <form method="POST" action="/registrar_cliente">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Nombre Completo</label>
+                                <input type="text" class="form-control" name="cliente" required placeholder="Tu nombre">
                             </div>
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Teléfono / WhatsApp</label>
+                                <input type="text" class="form-control" name="telefono" required placeholder="Ej. 89649798">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Equipo / Modelo</label>
+                                <input type="text" class="form-control" name="equipo" required placeholder="Ej. Samsung A51, Laptop Dell...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Falla o Servicio Solicitado</label>
+                                <textarea class="form-control" name="falla" rows="3" required placeholder="¿Qué problema presenta?"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 fw-bold"><i class="bi bi-send-fill"></i> Registrar Equipo</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-                        {% if orden.notas %}
-                        <div class="small text-muted">
-                            <strong>Notas del técnico:</strong> {{ orden.notas }}
-                        </div>
+            <!-- FORMULARIO DE CONSULTA PARA EL CLIENTE -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold text-secondary mb-3"><i class="bi bi-search"></i> Consultar mi Orden</h4>
+                        <p class="text-muted small">Introduce tu número de teléfono para verificar el avance de tu dispositivo.</p>
+                        <form method="GET" action="/" class="mb-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="telefono" value="{{ telefono_buscado }}" required placeholder="Número de teléfono...">
+                                <button type="submit" class="btn btn-primary fw-bold"><i class="bi bi-search"></i> Buscar</button>
+                            </div>
+                        </form>
+
+                        {% if telefono_buscado %}
+                            <hr>
+                            <h5 class="fw-bold text-secondary mb-3">Resultados para: {{ telefono_buscado }}</h5>
+                            {% if ordenes %}
+                                {% for orden in ordenes %}
+                                <div class="card bg-light border-0 mb-3 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-dark">Orden #{{ orden.id }}</span>
+                                            <span class="text-muted small"><i class="bi bi-calendar"></i> {{ orden.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
+                                        </div>
+                                        <h6 class="fw-bold text-primary mb-1">{{ orden.equipo }}</h6>
+                                        <p class="mb-2 small"><strong>Falla:</strong> {{ orden.falla }}</p>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <span class="badge {% if orden.estado == 'Listo para entregar' %}bg-success{% elif orden.estado == 'Entregado' %}bg-secondary{% else %}bg-warning text-dark{% endif %}">
+                                                {{ orden.estado }}
+                                            </span>
+                                            <span class="fw-bold text-dark">Total: L. {{ "%.2f"|format(orden.total) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-warning text-center small" role="alert">
+                                    No se encontró ningún equipo registrado con el número <strong>{{ telefono_buscado }}</strong>.
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
-                {% endfor %}
-            {% else %}
-                <div class="alert alert-warning text-center" role="alert">
-                    No se encontró ningún equipo registrado con el número <strong>{{ telefono_buscado }}</strong>.
-                </div>
-            {% endif %}
-        {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 """ + HTML_FOOTER
@@ -242,11 +260,11 @@ TEMPLATE_ADMIN = """
     </div>
 
     <div class="row g-4">
-        <!-- Formulario Nueva Orden -->
+        <!-- Formulario Nueva Orden Admin -->
         <div class="col-lg-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold text-primary mb-3"><i class="bi bi-plus-circle"></i> Nueva Orden</h4>
+                    <h4 class="card-title fw-bold text-primary mb-3"><i class="bi bi-plus-circle"></i> Nueva Orden (Interna)</h4>
                     <form method="POST" action="/admin/agregar">
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Cliente</label>
@@ -497,6 +515,7 @@ TEMPLATE_TICKET = """
 """
 
 # RUTAS DE LA APLICACIÓN Y SEGURIDAD
+
 @app.route('/')
 def portal_cliente():
     telefono_buscado = request.args.get('telefono', '').strip()
@@ -505,6 +524,33 @@ def portal_cliente():
         ordenes = Orden.query.filter_by(telefono=telefono_buscado).all()
     
     return render_template_string(TEMPLATE_CLIENTE, ordenes=ordenes, telefono_buscado=telefono_buscado)
+
+# NUEVA RUTA: Recibe los datos cuando el cliente registra su equipo
+@app.route('/registrar_cliente', methods=['POST'])
+def registrar_cliente():
+    cliente = request.form.get('cliente', '').strip()
+    telefono = request.form.get('telefono', '').strip()
+    equipo = request.form.get('equipo', '').strip()
+    falla = request.form.get('falla', '').strip()
+    
+    if cliente and telefono and equipo and falla:
+        nueva_orden = Orden(
+            cliente=cliente,
+            telefono=telefono,
+            equipo=equipo,
+            falla=falla,
+            estado='Pendiente',
+            costo_repuestos=0.0,
+            mano_obra=0.0,
+            total=0.0,
+            estado_pago='Pendiente'
+        )
+        db.session.add(nueva_orden)
+        db.session.commit()
+        # Redirige de nuevo a la pantalla principal mostrando su orden recién creada
+        return redirect(url_for('portal_cliente', telefono=telefono))
+        
+    return redirect(url_for('portal_cliente'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
